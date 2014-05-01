@@ -6,6 +6,8 @@ A simple pacman and cower wrapper written in bash to help with everyday package 
 Usage: wrapaur [OPTION]... [PACKAGE]...
   -a install from aur
   -c clean pacman cache with pacman -Sc, optimize pacman database, and clear .wrapaur folder
+  -e check for updates from official repositories and aur and print available updates or email results if email is present in .wrapaurrc (add to cron or systemd timer to have email updates for new packages)
+      note: email must be properly configured on system
   -i install from official repositories
   -l list installed packages with package count
   -m update pacman mirrorlist wth reflector (default options: top 200 http servers sorted by download rate)
