@@ -4,6 +4,7 @@ wrapaur
 A simple pacman and cower wrapper written in bash to help with everyday package tasks
 
 Usage: wrapaur [OPTION]... [PACKAGE]...
+(for multiple packages pass option each time; e.g. -i package1 -i package2)
   -a install from aur
   -c clean pacman cache with pacman -Sc, optimize pacman database, and clear .wrapaur folder
   -e check for updates from official repositories and aur and print available updates or email results if email is present in .wrapaurrc (add to cron or systemd timer to have email updates for new packages)
