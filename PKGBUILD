@@ -2,7 +2,7 @@
 
 pkgname=wrapaur
 pkgver=1.6.2
-pkgrel=1
+pkgrel=2
 pkgdesc="A simple pacman and cower wrapper written in bash to help with everyday package tasks"
 arch=('i686' 'x86_64')
 url="https://github.com/whahn1983/wrapaur"
@@ -10,7 +10,7 @@ license=('GPL')
 depends=('bash' 'cower' 'pacman' 'sudo' )
 optdepends=('reflector: required to update mirrorlist')
 source=("wrapaur")
-md5sums=('23bc14fba8a178f844aeed845dfbe2a2')
+md5sums=('ae2b273d05822a01e2c6e42bdfbed07a')
 
 package() {
   install -Dm755 wrapaur "$pkgdir/usr/bin/wrapaur"
