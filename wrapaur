@@ -276,7 +276,7 @@ check_updates()
 	tempfile=$(mktemp -t wrapaur_current.XXXXXXXXXX)
 	echo -e "${pacupdates}\n${aurupdates}" > $tempfile
 	#check updates against history file to avoid repeated emails
-	diff -q <(sort $HOME/.wrapaur_history | uniq) <(sort $tempfile | uniq)
+	diff -q <(sort $HOME/.wrapaur_history | uniq) <(sort $tempfile | uniq) > /dev/null
 	if [ $? -eq 1 ]; then
 		checkfile="yes"
 	fi
