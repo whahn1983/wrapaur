@@ -215,172 +215,226 @@ update_mirrors()
 					case $opt in
 						"Australia")
 							country="Australia"
+							break
 							;;
 						"Austria")
-							country="Austria"
+							country="Austria"	
+							break
 							;;
 						"Bangladesh")
-							country="Bangladesh"
+							country="Bangladesh"	
+							break
 							;;
 						"Belarus")
-							country="Belarus"
+							country="Belarus"	
+							break
 							;;
 						"Belgium")
-							country="Belgium"
+							country="Belgium"	
+							break
 							;;
 						"Brazil")
-							country="Brazil"
+							country="Brazil"	
+							break
 							;;
 						"Bulgaria")
-							country="Bulgaria"
+							country="Bulgaria"	
+							break
 							;;
 						"Canada")
-							country="Canada"
+							country="Canada"	
+							break
 							;;
 						"Chile")
-							country="Chile"
+							country="Chile"	
+							break
 							;;
 						"China")
-							country="China"
+							country="China"	
+							break
 							;;
 						"Colombia")
-							country="Columbia"
+							country="Columbia"	
+							break
 							;;
 						"Croatia")
-							country="Croatia"
+							country="Croatia"	
+							break
 							;;
 						"Czech Republic")
-							country="Czech Republic"
+							country="Czech Republic"	
+							break
 							;;
 						"Denmark")
-							country="Denmark"
+							country="Denmark"	
+							break
 							;;
 						"Ecuador")
-							country="Ecuador"
+							country="Ecuador"	
+							break
 							;;
 						"Estonia")
-							country="Estonia"
+							country="Estonia"	
+							break
 							;;
 						"Finland")
-							country="Finland"
+							country="Finland"	
+							break
 							;;
 						"France")
-							country="France"
+							country="France"	
+							break
 							;;
 						"Germany")
-							country="Germany"
+							country="Germany"	
+							break
 							;;
 						"Greece")
-							country="Greece"
+							country="Greece"	
+							break
 							;;
 						"Hong Kong")
-							country="Hong Kong"
+							country="Hong Kong"	
+							break
 							;;
 						"Iceland")
-							country="Iceland"
+							country="Iceland"	
+							break
 							;;
 						"India")
-							country="India"
+							country="India"	
+							break
 							;;
 						"Ireland")
-							country="Ireland"
+							country="Ireland"	
+							break
 							;;
 						"Italy")
-							country="Italy"
+							country="Italy"	
+							break
 							;;
 						"Japan")
-							country="Japan"
+							country="Japan"	
+							break
 							;;
 						"Kazakhstan")
-							country="Kazakhstan"
+							country="Kazakhstan"	
+							break
 							;;
 						"Korea")
-							country="Korea"
+							country="Korea"	
+							break
 							;;
 						"Lithuania")
-							country="Lithuania"
+							country="Lithuania"	
+							break
 							;;
 						"Luxembourg")
-							country="Luxembourg"
+							country="Luxembourg"	
+							break
 							;;
 						"Macedonia")
-							country="Macedonia"
+							country="Macedonia"	
+							break
 							;;
 						"Netherlands")
-							country="Netherlands"
+							country="Netherlands"	
+							break
 							;;
 						"New Caledonia")
-							country="New Caledonia"
+							country="New Caledonia"	
+							break
 							;;
 						"New Zealand")
-							country="New Zealand"
+							country="New Zealand"	
+							break
 							;;
 						"Norway")
-							country="Norway"
+							country="Norway"	
+							break
 							;;
 						"Philippines")
-							country="Philippines"
+							country="Philippines"	
+							break
 							;;
 						"Poland")
-							country="Poland"
+							country="Poland"	
+							break
 							;;
 						"Portugal")
-							country="Portugal"
+							country="Portugal"	
+							break
 							;;
 						"Romania")
-							country="Romania"
+							country="Romania"	
+							break
 							;;
 						"Russian Federation")
-							country="Russian Federation"
+							country="Russian Federation"	
+							break
 							;;
 						"Serbia")
-							country="Serbia"
+							country="Serbia"	
+							break
 							;;
 						"Singapore")
-							country="Singapore"
+							country="Singapore"	
+							break
 							;;
 						"Slovakia")
-							country="Slovakia"
+							country="Slovakia"	
+							break
 							;;
 						"South Africa")
-							country="South Africa"
+							country="South Africa"	
+							break
 							;;
 						"Spain")
-							country="Spain"
+							country="Spain"	
+							break
 							;;
 						"Sri Lanka")
-							country="Sri Lanka"
+							country="Sri Lanka"	
+							break
 							;;
 						"Sweden")
-							country="Sweden"
+							country="Sweden"	
+							break
 							;;
 						"Switzerland")
-							country="Switzerland"
+							country="Switzerland"	
+							break
 							;;
 						"Taiwan")
-							country="Taiwan"
+							country="Taiwan"	
+							break
 							;;
 						"Turkey")
-							country="Turkey"
+							country="Turkey"	
+							break
 							;;
 						"Ukraine")
-							country="Ukraine"
+							country="Ukraine"	
+							break
 							;;
 						"United Kingdom")
-							country="United Kingdom"
+							country="United Kingdom"	
+							break
 							;;
 						"United States")
-							country="United States"
+							country="United States"	
+							break
 							;;
 						"Viet Nam")
-							country="Viet Nam"
+							country="Viet Nam"	
+							break
 							;;
 						"All")
-							country="All"
+							country="All"	
+							break
 							;;
 						*) echo Invalid Option;;
 					esac
-					break
 				done
 				#until [[ -n $rcchoice ]]; do
 				#	read -p "$rcprompt" rcchoice
