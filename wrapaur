@@ -35,8 +35,14 @@ update_all()
 
 	#run cower update for AUR and assign item names to downloads variable
 	echo -e "${color1}:: ${color2}Checking the AUR for updates...${color3}"
-	downloads=$(cower -uddf -t $HOME/.wrapaur | cut -d ' ' -f 2)
-	downloads=$(echo -e $downloads | tac -s " ")
+	aurpkgs=$(pacman -Qm | awk '{print $1}')
+	for line in $aurpkgs
+	do
+		vcheck=$(check_pkgversion $line)
+		if [[ $vcheck == 1 ]]; then
+			downloads=$(echo -e "$downloads\n$line")
+		fi
+	done
 	#check if updates were found and assigned to downloads variable
 	if [[ -z $downloads ]]; then
 		echo -e " ${color3}there is nothing to do"
@@ -47,39 +53,10 @@ update_all()
 		do
 			echo -e $line
 		done
-		dprompt=$(echo -e "${color1}:: ${color2}Proceed with installation? [Y/n] ${color3}")
-		until [ "$dchoice" == "y" ] || [ "$dchoice" == "n" ] || [ "$dchoice" == "Y" ] || [ "$dchoice" == "N" ]; do
-			read -p "$dprompt" dchoice
-		done	
-		#if chosen to install now, loop through each item in downloads variable, install and run pacman -U, then remove folder
-		if [ "$dchoice" == "y" ] || [ "$dchoice" == "Y" ]; then
-			for line in $downloads
-			do
-				cd $HOME/.wrapaur/$line
-				echo -e "installing  ${line}..."
-				eprompt=$(echo -e "${color1}:: ${color2}Edit PKGBUILD? [Y/n] ${color3}")
-				until [ "$echoice" == "y" ] || [ "$echoice" == "n" ] || [ "$echoice" == "Y" ] || [ "$echoice" == "N" ]; do
-					read -p "$eprompt" echoice
-				done	
-				#if chosen to edit PKGBUILD open editor
-				if [ "$echoice" == "y" ] || [ "$echoice" == "Y" ]; then
-					$EDITOR PKGBUILD
-				fi
-				makepkg -si
-				cd $HOME/.wrapaur
-				ruprompt=$(echo -e "${color1}:: ${color2}Remove source folder? [Y/n] ${color3}")
-				until [ "$ruchoice" == "y" ] || [ "$ruchoice" == "n" ] || [ "$ruchoice" == "Y" ] || [ "$ruchoice" == "N" ]; do
-					read -p "$ruprompt" ruchoice
-				done
-				if [ "$ruchoice" == "y" ] || [ "$ruchoice" == "Y" ]; then
-					rm -Rf $HOME/.wrapaur/$line
-				fi
-				echoice="x"
-				ruchoice="x"
-			done
-		else
-			echo -e " ${color3}updates downloaded to $HOME/.wrapaur"
-		fi
+		for line in $downloads
+		do
+			all_install $line
+		done
 	fi
 }
 
@@ -88,7 +65,9 @@ package_search()
 {
 	#search with pacman and cower
 	pacman -Ss $1
-	cower -sc $1
+	#aur search
+	curl -s "https://aur.archlinux.org/rpc.php?type=search&arg=$1" | awk -F , 'BEGIN {RS = "{"} {print $0}' | awk -F : 'BEGIN {RS = ","} {print $0}' | grep -E '"Name":"|"Version":"|"Description":"' | while read line; do if [[ $line == *"Name"* ]]; then name=$(echo $line | awk -F : '{print $2}' | sed 's/"//g'); elif [[ $line == *"Version"* ]]; then version=$(echo $line| awk -F : '{print $2}' | sed 's/"//g'); elif [[ $line == *"Description"* ]]; then desc=$(echo $line | awk -F : '{print $2}' | sed 's/"//g') && echo -e "aur\\$name $version\n$desc";fi; done < /dev/stdin
+
 }
 
 #official install option selected
@@ -103,57 +82,6 @@ pac_remove()
 {
 	#remove with pacman
 	sudo pacman -Rsn $1
-}
-
-#aur install option selected
-aur_install()
-{
-	#run cower download with dependencies, loop to install all downloaded packages
-	ainstalls=$(cower -ddf -t $HOME/.wrapaur $1 | cut -d ' ' -f 2)
-	ainstalls=$(echo -e $ainstalls | tac -s " ")
-	if [[ -z $ainstalls ]]; then
-		echo -e " ${color3}there is nothing to do"
-	else
-		#if packages were found, echo install list and ask to install
-		echo -e "${color1}:: ${color2}Packages found...${color3}"
-		for line in $ainstalls
-		do
-			echo -e $line
-		done
-		aprompt=$(echo -e "${color1}:: ${color2}Proceed with installation? [Y/n] ${color3}")
-		until [ "$ichoice" == "y" ] || [ "$ichoice" == "n" ] || [ "$ichoice" == "Y" ] || [ "$ichoice" == "N" ]; do
-			read -p "$aprompt" ichoice
-		done	
-		#if chosen to install now, loop through each item in ainstalls variable, install and run pacman -U, then remove folder
-		if [ "$ichoice" == "y" ] || [ "$ichoice" == "Y" ]; then
-			for line in $ainstalls
-			do
-				cd $HOME/.wrapaur/$line
-				echo -e "installing ${line}..."
-				eprompt=$(echo -e "${color1}:: ${color2}Edit PKGBUILD? [Y/n] ${color3}")
-				until [ "$echoice" == "y" ] || [ "$echoice" == "n" ] || [ "$echoice" == "Y" ] || [ "$echoice" == "N" ]; do
-					read -p "$eprompt" echoice
-				done	
-				#if chosen to edit PKGBUILD open editor
-				if [ "$echoice" == "y" ] || [ "$echoice" == "Y" ]; then
-					$EDITOR PKGBUILD
-				fi			
-				makepkg -si
-				cd $HOME/.wrapaur
-				raprompt=$(echo -e "${color1}:: ${color2}Remove source folder? [Y/n] ${color3}")
-				until [ "$rachoice" == "y" ] || [ "$rachoice" == "n" ] || [ "$rachoice" == "Y" ] || [ "$rachoice" == "N" ]; do
-					read -p "$raprompt" rachoice
-				done
-				if [ "$rachoice" == "y" ] || [ "$rachoice" == "Y" ]; then			
-					rm -Rf $HOME/.wrapaur/$line
-				fi
-				echoice="x"
-				rachoice="x"
-			done	
-		else
-			echo -e " ${color3}updates downloaded to $HOME/.wrapaur"
-		fi
-	fi
 }
 
 #clear cache option selected
@@ -502,7 +430,14 @@ check_updates()
 	echo -e "${color1}:: ${color2}Checking for updates... ${color3}"
 	#check for updates and place in variables
 	pacupdates=$(pacman -Qu)
-	aurupdates=$(cower -u)
+	aurpkgs=$(pacman -Qm | awk '{print $1}')
+	for line in $aurpkgs
+	do
+		vcheck=$(check_pkgversion $line)
+		if [[ $vcheck == 1 ]]; then
+			aurupdates=$(echo -e "$aurupdates\n$line")
+		fi
+	done
 	#write current updates to temp file
 	tempfile=$(mktemp -t wrapaur_current.XXXXXXXXXX)
 	echo -e "${pacupdates}\n${aurupdates}" > $tempfile
@@ -526,6 +461,91 @@ check_updates()
 	echo -e "${pacupdates}\n${aurupdates}" > $HOME/.wrapaur_history
 }
 
+check_pkgversion()
+{
+	newver=$(curl -s "https://aur.archlinux.org/rpc.php?type=info&arg=$1" | awk -F : '{print $10}' | awk -F , '{print $1}' | sed 's/"//g')
+	currentver=$(pacman -Qi $1 | awk '{print $3}' | head -n 2 | tail -n 1)
+	if [[ $newver != $currentver ]]; then
+		return 1
+	fi
+}
+
+check_all_depends()
+{
+	echo -e "${color1}:: ${color2}Checking Dependencies...${color3}"
+	depends=$(curl -s "https://aur4.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$1" | pcregrep -M "^depends.*?(\n|.)*?'\)" | sed -e "s/[a-z]*=('//g" -e "s/'//g" -e "s/)//g")
+	if [[ $depends == "" ]]; then
+		aur_git_install $1
+	else
+		for line in $depends
+		do
+			line=$(echo $line | sed -e "s/>=[^=]*$//g" -e "s/<=[^=]*$//g")
+			pacman -Qi $line &>/dev/null
+			if [[ $? == 1 ]]; then
+				sudo pacman -S --needed $line 2>/dev/null
+				if [[ $? == 1 ]]; then
+					check_all_depends $line
+					aur_git_install $line
+				fi
+			fi
+		done 
+	fi
+}
+
+all_install()
+{
+	check_all_depends $1
+	aur_git_install $1
+}
+
+aur_git_install()
+{
+	#wget -qO- https://aur4.archlinux.org/packages/$1 -o /dev/null &> /dev/null
+	exists=$(curl -s "https://aur4.archlinux.org/rpc.php?type=info&arg=$1" | awk -F : '{print $4}' | awk -F , '{print $1}')
+	if [[ $exists != 0 ]]; then
+		echo -e "${color1}:: ${color2}Packages found...${color3}"
+		echo -e $1
+		if [[ ! -d $HOME/.wrapaur/$1 ]]; then
+			git clone https://aur4.archlinux.org/${1}.git $HOME/.wrapaur/$1
+		else
+			cd $HOME/.wrapaur/$1
+			git pull
+		fi
+		aprompt=$(echo -e "${color1}:: ${color2}Proceed with installation? [Y/n] ${color3}")
+		until [ "$ichoice" == "y" ] || [ "$ichoice" == "n" ] || [ "$ichoice" == "Y" ] || [ "$ichoice" == "N" ]; do
+			read -p "$aprompt" ichoice
+		done	
+		#if chosen to install now, loop through each item in ainstalls variable, install and run pacman -U, then remove folder
+		if [ "$ichoice" == "y" ] || [ "$ichoice" == "Y" ]; then
+			cd $HOME/.wrapaur/$1
+			echo -e "installing ${1}..."
+			eprompt=$(echo -e "${color1}:: ${color2}Edit PKGBUILD? [Y/n] ${color3}")
+			until [ "$echoice" == "y" ] || [ "$echoice" == "n" ] || [ "$echoice" == "Y" ] || [ "$echoice" == "N" ]; do
+				read -p "$eprompt" echoice
+			done	
+			#if chosen to edit PKGBUILD open editor
+			if [ "$echoice" == "y" ] || [ "$echoice" == "Y" ]; then
+				$EDITOR PKGBUILD
+			fi			
+			makepkg -si
+			cd $HOME/.wrapaur
+			raprompt=$(echo -e "${color1}:: ${color2}Remove source folder? [Y/n] ${color3}")
+			until [ "$rachoice" == "y" ] || [ "$rachoice" == "n" ] || [ "$rachoice" == "Y" ] || [ "$rachoice" == "N" ]; do
+				read -p "$raprompt" rachoice
+			done
+			if [ "$rachoice" == "y" ] || [ "$rachoice" == "Y" ]; then			
+				rm -Rf $HOME/.wrapaur/$1
+			fi
+			echoice="x"
+			rachoice="x"
+		else
+			echo -e " ${color3}updates downloaded to $HOME/.wrapaur"
+		fi
+	else
+		echo -e "Package not found."
+	fi
+}
+
 usage()
 {
 	echo $'Usage: wrapaur [OPTION]... [PACKAGE]...\n(for multiple packages pass option each time; e.g. -i package1 -i package2)\n  -a install from aur\n  -c clean pacman cache with pacman -Sc, optimize pacman database, and clear .wrapaur folder\n  -e check for updates from official repositories and aur and print available updates or email results if email is present in .wrapaurrc (add to cron or systemd timer to have email updates for new packages)\n      note: email must be properly configured on system\n  -i install from official repositories\n  -l list installed packages with package count\n  -m update pacman mirrorlist wth reflector\n  -q query information on a specific package\n  -r remove a package with pacman -Rsn (for other removal options use pacman)\n  -s search official repositories and aur\n  -u update official repositories and aur'
@@ -536,7 +556,7 @@ usage()
 while getopts "a:cei:lmq:r:s:u" args; do
 	case $args in
 		a)
-			aur_install $OPTARG
+			all_install $OPTARG
 			;;
 		c)
 			clear_cache
