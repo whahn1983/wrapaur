@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-#A simple pacman and cower wrapper written in bash
+#A simple pacman and AUR wrapper written in bash
 #Developer: William Hahn <bill@hahn3.com>
 
 ##########Initialization##########
@@ -33,7 +33,7 @@ update_all()
 	#run pacman update
 	sudo pacman -Syu
 
-	#run cower update for AUR and assign item names to downloads variable
+	#check for AUR updates and assign item names to downloads variable
 	echo -e "${color1}:: ${color2}Checking the AUR for updates...${color3}"
 	aurpkgs=$(pacman -Qm | awk '{print $1}')
 	for line in $aurpkgs
@@ -55,7 +55,7 @@ update_all()
 		done
 		for line in $downloads
 		do
-			all_install $line
+			aur_dep_install $line
 		done
 	fi
 }
@@ -63,7 +63,7 @@ update_all()
 #search option selected
 package_search()
 {
-	#search with pacman and cower
+	#search with pacman
 	pacman -Ss $1
 	#aur search
 	curl -s "https://aur.archlinux.org/rpc.php?type=search&arg=$1" | awk -F , 'BEGIN {RS = "{"} {print $0}' | awk -F : 'BEGIN {RS = ","} {print $0}' | grep -E '"Name":"|"Version":"|"Description":"' | while read line; do if [[ $line == *"Name"* ]]; then name=$(echo $line | awk -F : '{print $2}' | sed 's/"//g'); elif [[ $line == *"Version"* ]]; then version=$(echo $line| awk -F : '{print $2}' | sed 's/"//g'); elif [[ $line == *"Description"* ]]; then desc=$(echo $line | awk -F : '{print $2}' | sed 's/"//g') && echo -e "aur\\$name $version\n$desc";fi; done < /dev/stdin
@@ -473,10 +473,12 @@ check_pkgversion()
 check_all_depends()
 {
 	echo -e "${color1}:: ${color2}Checking Dependencies...${color3}"
-	depends=$(curl -s "https://aur4.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$1" | pcregrep -M "^depends.*?(\n|.)*?'\)" | sed -e "s/[a-z]*=('//g" -e "s/'//g" -e "s/)//g")
+	depends=$(curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$1" | pcregrep -M "^depends.*?(\n|.)*?'\)" | sed -e "s/[a-z]*=('//g" -e "s/'//g" -e "s/)//g")
+	#if no dependencies echo and leave loop
 	if [[ $depends == "" ]]; then
-		aur_git_install $1
+		echo "No dependencies found..."
 	else
+		#loop through dependencies recursively, check if installed, try pacman install, then aur install
 		for line in $depends
 		do
 			line=$(echo $line | sed -e "s/>=[^=]*$//g" -e "s/<=[^=]*$//g")
@@ -492,7 +494,7 @@ check_all_depends()
 	fi
 }
 
-all_install()
+aur_dep_install()
 {
 	check_all_depends $1
 	aur_git_install $1
@@ -500,13 +502,14 @@ all_install()
 
 aur_git_install()
 {
-	#wget -qO- https://aur4.archlinux.org/packages/$1 -o /dev/null &> /dev/null
-	exists=$(curl -s "https://aur4.archlinux.org/rpc.php?type=info&arg=$1" | awk -F : '{print $4}' | awk -F , '{print $1}')
+	#check if package exists in AUR
+	exists=$(curl -s "https://aur.archlinux.org/rpc.php?type=info&arg=$1" | awk -F : '{print $4}' | awk -F , '{print $1}')
 	if [[ $exists != 0 ]]; then
 		echo -e "${color1}:: ${color2}Packages found...${color3}"
 		echo -e $1
+		#clone git package to wrapaur folder or update if exists
 		if [[ ! -d $HOME/.wrapaur/$1 ]]; then
-			git clone https://aur4.archlinux.org/${1}.git $HOME/.wrapaur/$1
+			git clone https://aur.archlinux.org/${1}.git $HOME/.wrapaur/$1
 		else
 			cd $HOME/.wrapaur/$1
 			git pull
@@ -515,7 +518,7 @@ aur_git_install()
 		until [ "$ichoice" == "y" ] || [ "$ichoice" == "n" ] || [ "$ichoice" == "Y" ] || [ "$ichoice" == "N" ]; do
 			read -p "$aprompt" ichoice
 		done	
-		#if chosen to install now, loop through each item in ainstalls variable, install and run pacman -U, then remove folder
+		#if chosen to install now, compile and run pacman -U, then remove folder
 		if [ "$ichoice" == "y" ] || [ "$ichoice" == "Y" ]; then
 			cd $HOME/.wrapaur/$1
 			echo -e "installing ${1}..."
@@ -556,7 +559,7 @@ usage()
 while getopts "a:cei:lmq:r:s:u" args; do
 	case $args in
 		a)
-			all_install $OPTARG
+			aur_dep_install $OPTARG
 			;;
 		c)
 			clear_cache
