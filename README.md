@@ -1,7 +1,7 @@
 wrapaur
 =======
 
-A simple pacman and cower wrapper written in bash to help with everyday package tasks
+A simple pacman and AUR wrapper written in bash to help with everyday package tasks
 
 Usage: wrapaur [OPTION]... [PACKAGE]...
 (for multiple packages pass option each time; e.g. -i package1 -i package2)
