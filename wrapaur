@@ -473,15 +473,18 @@ check_pkgversion()
 check_all_depends()
 {
 	echo -e "${color1}:: ${color2}Checking Dependencies...${color3}"
-	depends=$(curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$1" | pcregrep -M "^depends.*?(\n|.)*?'\)" | sed -e "s/[a-z]*=('//g" -e "s/'//g" -e "s/)//g")
+	depends=$(curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$1" | sed -nr "1,/\bdepends=/{/depends=/,/\)/p}" | sed -e "s/[a-z]*=('//g" -e "s/'//g" -e "s/)//g")
+	mdepends=$(curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$1" | sed -nr "1,/\bmakedepends=/{/makedepends=/,/\)/p}" | sed -e "s/[a-z]*=('//g" -e "s/'//g" -e "s/)//g")
+	dependsx64=$(curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$1" | sed -nr "1,/\bdepends_x86_64=/{/depends_x86_64=/,/\)/p}" | sed -e "s/[a-z]*=('//g" -e "s/'//g" -e "s/)//g")
+	dependsi686=$(curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$1" | sed -nr "1,/\bdepends_i686=/{/depends_i686=/,/\)/p}" | sed -e "s/[a-z]*=('//g" -e "s/'//g" -e "s/)//g")
 	#if no dependencies echo and leave loop
 	if [[ $depends == "" ]]; then
 		echo "No dependencies found..."
 	else
 		#loop through dependencies recursively, check if installed, try pacman install, then aur install
-		for line in $depends
+		for line in $depends $mdepends $dependsx64 $dependsi686
 		do
-			line=$(echo $line | sed -e "s/>=[^=]*$//g" -e "s/<=[^=]*$//g")
+			line=$(echo $line | sed -e "s/>=[^=]*$//g" -e "s/<=[^=]*$//g" -e "s/<[^<]*$//g" -e "s/>[^>]*$//g")
 			pacman -Qi $line &>/dev/null
 			if [[ $? == 1 ]]; then
 				sudo pacman -S --needed $line 2>/dev/null
