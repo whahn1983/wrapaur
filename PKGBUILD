@@ -8,7 +8,7 @@ arch=('i686' 'x86_64')
 url="https://aur.archlinux.org/wrapaur.git"
 license=('GPL')
 depends=('bash' 'curl' 'grep' 'gawk' 'sed' 'git' 'pacman' 'sudo')
-optdepends=('reflector: required to update mirrorlist')
+optdepends=('reflector: required to update mirrorlist' 's-nail: required for email notifications')
 source=("wrapaur")
 md5sums=('c2314fdff31e541515191e8291f95760')
 
