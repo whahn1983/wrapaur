@@ -20,7 +20,7 @@ fi
 if [ -f $HOME/.wrapaurrc ]; then
 	source $HOME/.wrapaurrc
 else
-	echo -e "#Configuration file for wrapaur\n\n#Set country for reflector mirror update\ncountry=\n\n#Set number of top mirrors to sync\nmirrorcount=\n\n#Set for no prompts on mirror update\nmirrorprompt=\n\n#Set email for package updates\nemail=\n\n#Set colors\ncolor1=''\ncolor2=''\ncolor3=''" > $HOME/.wrapaurrc
+	echo -e "#Configuration file for wrapaur\n\n#Set country for mirror update\ncountry=\n\n#Set number of top mirrors to sync\nmirrorcount=\n\n#Set for no prompts on mirror update\nmirrorprompt=\n\n#Set email for package updates\nemail=\n\n#Set colors\ncolor1=''\ncolor2=''\ncolor3=''" > $HOME/.wrapaurrc
 	echo "wrapaur configuration file created at $HOME/.wrapaurrc"
 	chmod 600 $HOME/.wrapaurrc
 fi
@@ -120,17 +120,13 @@ update_mirrors()
 	if [[ -z $mirrorcount ]]; then
 		mirrorcount=200
 	fi
-	#check if reflector is installed
-	reflector --help > /dev/null 2>/dev/null
-	if [ $? -eq 127 ]; then
-		echo -e "Optional dependency not installed.  Use wrapaur -i reflector"	
 	#run with no prompts
-	elif [ "$mirrorprompt" == "no" ] || [[ ! -t 0 ]]; then
+	if [ "$mirrorprompt" == "no" ] || [[ ! -t 0 ]]; then
 		sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
 		if [[ -z $country ]]; then
-			sudo reflector --verbose -l $mirrorcount -p http --sort rate --save /etc/pacman.d/mirrorlist
+			sudo curl -s "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&ip_version=4&use_mirror_status=on" | sed 's/#Server/Server/g' | head -n $((6+2*$mirrorcount)) > /etc/pacman.d/mirrorlist
 		else
-			sudo reflector --verbose --country "${country}" -l $mirrorcount -p http --sort rate --save /etc/pacman.d/mirrorlist	
+			sudo curl -s "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=http&ip_version=4&use_mirror_status=on" | sed 's/#Server/Server/g' | head -n $((6+2*$mirrorcount)) > /etc/pacman.d/mirrorlist
 		fi
 	#run with prompts
 	else
@@ -143,241 +139,238 @@ update_mirrors()
 			if [[ -z $country ]]; then
 				rcprompt=$(echo -e "${color1}:: ${color2}Enter Country or All: ${color3}")
 				PS3=${rcprompt}
-				moptions=("Australia" "Austria" "Bangladesh" "Belarus" "Belgium" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Croatia" "Czech Republic" "Denmark" "Ecuador" "Estonia" "Finland" "France" "Germany" "Greece" "Hong Kong" "Iceland" "India" "Ireland" "Italy" "Japan" "Kazakhstan" "Korea" "Lithuania" "Luxembourg" "Macedonia" "Netherlands" "New Caledonia" "New Zealand" "Norway" "Philippines" "Poland" "Portugal" "Romania" "Russian Federation" "Serbia" "Singapore" "Slovakia" "South Africa" "Spain" "Sri Lanka" "Sweden" "Switzerland" "Taiwan" "Turkey" "Ukraine" "United Kingdom" "United States" "Viet Nam" "All")
+				moptions=("Australia" "Austria" "Bangladesh" "Belarus" "Belgium" "Brazil" "Bulgaria" "Canada" "Chile" "China" "Colombia" "Croatia" "Czech Republic" "Denmark" "Ecuador" "Estonia" "France" "Germany" "Greece" "Hungary" "Iceland" "India" "Indonesia" "Ireland" "Israel" "Italy" "Japan" "Kazakhstan" "Latvia" "Lithuania" "Luxembourg" "Macedonia" "Netherlands" "New Caledonia" "New Zealand" "Norway" "Poland" "Portugal" "Romania" "Russia" "Serbia" "Singapore" "Slovakia" "South Africa" "South Korea" "Spain" "Sweden" "Switzerland" "Taiwan" "Turkey" "Ukraine" "United Kingdom" "United States" "Vietnam" "All")
 				select opt in "${moptions[@]}"
 				do
 					case $opt in
 						"Australia")
-							country="Australia"
+							country="AU"
 							break
 							;;
 						"Austria")
-							country="Austria"	
+							country="AT"	
 							break
 							;;
 						"Bangladesh")
-							country="Bangladesh"	
+							country="BD"	
 							break
 							;;
 						"Belarus")
-							country="Belarus"	
+							country="BY"	
 							break
 							;;
 						"Belgium")
-							country="Belgium"	
+							country="BE"	
 							break
 							;;
 						"Brazil")
-							country="Brazil"	
+							country="BR"	
 							break
 							;;
 						"Bulgaria")
-							country="Bulgaria"	
+							country="BG"	
 							break
 							;;
 						"Canada")
-							country="Canada"	
+							country="CA"	
 							break
 							;;
 						"Chile")
-							country="Chile"	
+							country="CL"	
 							break
 							;;
 						"China")
-							country="China"	
+							country="CN"	
 							break
 							;;
 						"Colombia")
-							country="Columbia"	
+							country="CO"	
 							break
 							;;
 						"Croatia")
-							country="Croatia"	
+							country="HR"	
 							break
 							;;
 						"Czech Republic")
-							country="Czech Republic"	
+							country="CZ"	
 							break
 							;;
 						"Denmark")
-							country="Denmark"	
+							country="DK"	
 							break
 							;;
 						"Ecuador")
-							country="Ecuador"	
+							country="EC"	
 							break
 							;;
 						"Estonia")
-							country="Estonia"	
-							break
-							;;
-						"Finland")
-							country="Finland"	
+							country="EE"	
 							break
 							;;
 						"France")
-							country="France"	
+							country="FR"	
 							break
 							;;
 						"Germany")
-							country="Germany"	
+							country="DE"	
 							break
 							;;
 						"Greece")
-							country="Greece"	
+							country="GR"	
 							break
 							;;
-						"Hong Kong")
-							country="Hong Kong"	
+						"Hungary")
+							country="HU"	
 							break
 							;;
 						"Iceland")
-							country="Iceland"	
+							country="IS"	
 							break
 							;;
 						"India")
-							country="India"	
+							country="IN"	
+							break
+							;;
+						"Indonesia")
+							country="ID"
 							break
 							;;
 						"Ireland")
-							country="Ireland"	
+							country="IE"	
+							break
+							;;
+						"Israel")
+							country="IL"
 							break
 							;;
 						"Italy")
-							country="Italy"	
+							country="IT"	
 							break
 							;;
 						"Japan")
-							country="Japan"	
+							country="JP"	
 							break
 							;;
 						"Kazakhstan")
-							country="Kazakhstan"	
+							country="KZ"	
 							break
 							;;
-						"Korea")
-							country="Korea"	
+						"Latvia")
+							country="LV"	
 							break
 							;;
 						"Lithuania")
-							country="Lithuania"	
+							country="LT"	
 							break
 							;;
 						"Luxembourg")
-							country="Luxembourg"	
+							country="LU"	
 							break
 							;;
 						"Macedonia")
-							country="Macedonia"	
+							country="MK"	
 							break
 							;;
 						"Netherlands")
-							country="Netherlands"	
+							country="NL"	
 							break
 							;;
 						"New Caledonia")
-							country="New Caledonia"	
+							country="NC"	
 							break
 							;;
 						"New Zealand")
-							country="New Zealand"	
+							country="NZ"	
 							break
 							;;
 						"Norway")
-							country="Norway"	
-							break
-							;;
-						"Philippines")
-							country="Philippines"	
+							country="NO"	
 							break
 							;;
 						"Poland")
-							country="Poland"	
+							country="PL"	
 							break
 							;;
 						"Portugal")
-							country="Portugal"	
+							country="PT"	
 							break
 							;;
 						"Romania")
-							country="Romania"	
+							country="RO"	
 							break
 							;;
-						"Russian Federation")
-							country="Russian Federation"	
+						"Russia")
+							country="RU"	
 							break
 							;;
 						"Serbia")
-							country="Serbia"	
+							country="RS"	
 							break
 							;;
 						"Singapore")
-							country="Singapore"	
+							country="SG"	
 							break
 							;;
 						"Slovakia")
-							country="Slovakia"	
+							country="SK"	
 							break
 							;;
 						"South Africa")
-							country="South Africa"	
+							country="ZA"	
+							break
+							;;
+						"South Korea")
+							country="KR"
 							break
 							;;
 						"Spain")
-							country="Spain"	
-							break
-							;;
-						"Sri Lanka")
-							country="Sri Lanka"	
+							country="ES"	
 							break
 							;;
 						"Sweden")
-							country="Sweden"	
+							country="SE"	
 							break
 							;;
 						"Switzerland")
-							country="Switzerland"	
+							country="CH"	
 							break
 							;;
 						"Taiwan")
-							country="Taiwan"	
+							country="TW"	
 							break
 							;;
 						"Turkey")
-							country="Turkey"	
+							country="TR"	
 							break
 							;;
 						"Ukraine")
-							country="Ukraine"	
+							country="UA"	
 							break
 							;;
 						"United Kingdom")
-							country="United Kingdom"	
+							country="GB"	
 							break
 							;;
 						"United States")
-							country="United States"	
+							country="US"	
 							break
 							;;
-						"Viet Nam")
-							country="Viet Nam"	
+						"Vietnam")
+							country="VN"	
 							break
 							;;
 						"All")
-							country="All"	
+							country="all"	
 							break
 							;;
 						*) echo Invalid Option;;
 					esac
 				done
-				if [ "$country" == "All" ] || [ "$country" == "all" ] || [ "$country" == "ALL" ]; then
-					sudo reflector --verbose -l $mirrorcount -p http --sort rate --save /etc/pacman.d/mirrorlist
-				else
-					sudo reflector --verbose --country "${country}" -l $mirrorcount -p http --sort rate --save /etc/pacman.d/mirrorlist
-				fi
+				sudo curl -s "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=http&ip_version=4&use_mirror_status=on" | sed 's/#Server/Server/g' | head -n $((6+2*$mirrorcount)) > /etc/pacman.d/mirrorlist
 				echo -e " original mirrorlist has been backed up to /etc/pacman.d/mirrorlist.backup"
 			else
-				sudo reflector --verbose --country "${country}" -l $mirrorcount -p http --sort rate --save /etc/pacman.d/mirrorlist
+				sudo curl -s "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=http&ip_version=4&use_mirror_status=on" | sed 's/#Server/Server/g' | head -n $((6+2*$mirrorcount)) > /etc/pacman.d/mirrorlist
+				echo -e " original mirrorlist has been backed up to /etc/pacman.d/mirrorlist.backup"
 			fi
 		fi
 	fi
@@ -558,7 +551,7 @@ aur_git_install()
 
 usage()
 {
-	echo $'Usage: wrapaur [OPTION]... [PACKAGE]...\n(for multiple packages pass option each time; e.g. -i package1 -i package2)\n  -a install from aur\n  -c clean pacman cache with pacman -Sc, optimize pacman database, and clear .wrapaur folder\n  -e check for updates from official repositories and aur and print available updates or email results if email is present in .wrapaurrc (add to cron or systemd timer to have email updates for new packages)\n      note: email must be properly configured on system\n  -i install from official repositories\n  -l list installed packages with package count\n  -m update pacman mirrorlist wth reflector\n  -q query information on a specific package\n  -r remove a package with pacman -Rsn (for other removal options use pacman)\n  -s search official repositories and aur\n  -u update official repositories and aur'
+	echo $'Usage: wrapaur [OPTION]... [PACKAGE]...\n(for multiple packages pass option each time; e.g. -i package1 -i package2)\n  -a install from aur\n  -c clean pacman cache with pacman -Sc, optimize pacman database, and clear .wrapaur folder\n  -e check for updates from official repositories and aur and print available updates or email results if email is present in .wrapaurrc (add to cron or systemd timer to have email updates for new packages)\n      note: email must be properly configured on system\n  -i install from official repositories\n  -l list installed packages with package count\n  -m update pacman mirrorlist\n  -q query information on a specific package\n  -r remove a package with pacman -Rsn (for other removal options use pacman)\n  -s search official repositories and aur\n  -u update official repositories and aur'
 }
 
 ##########Main Program##########
