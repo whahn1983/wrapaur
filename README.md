@@ -11,7 +11,7 @@ Usage: wrapaur [OPTION]... [PACKAGE]...
       note: email must be properly configured on system
   -i install from official repositories
   -l list installed packages with package count
-  -m update pacman mirrorlist wth reflector (default options: top 200 http servers sorted by download rate)
+  -m update pacman mirrorlist
   -q query information on a specific package
   -r remove a package with pacman -Rsn (for other removal options use pacman)
   -s search official repositories and aur
