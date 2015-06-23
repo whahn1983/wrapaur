@@ -12,6 +12,8 @@ Usage: wrapaur [OPTION]... [PACKAGE]...
   -i install from official repositories
   -l list installed packages with package count
   -m update pacman mirrorlist
+  -n print the latest news from archlinux.org
+  -o print aur comments for a specific package
   -q query information on a specific package
   -r remove a package with pacman -Rsn (for other removal options use pacman)
   -s search official repositories and aur
