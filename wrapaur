@@ -549,14 +549,32 @@ aur_git_install()
 	fi
 }
 
+archnews()
+{
+	local IFS=\>
+	while read -d \< ENTITY CONTENT;
+	do
+		if [[ $ENTITY = "title" ]]; then
+			echo -e "------${CONTENT}------\n" | sed -r -e "s/&lt;\(.*\)&gt;//g"
+		elif [[ $ENTITY = "description" ]]; then
+			echo -e "${CONTENT}\n" | sed -r -e "s/amp;amp;//g" -e "s/&lt;[a-z|A-Z|/| |0-9|=|\"|:|_|\.|-|\?|;|#]*?&gt;//g"
+		fi
+	done < <(curl -s "https://www.archlinux.org/feeds/news/")
+}
+
+aur_comments()
+{
+	curl -s "https://aur.archlinux.org/packages/$1/?comments=all" | sed -r -n -e "/<div id=\"news\">/,/<!-- End of main content -->/p" | sed -e 's/<[^>]*>//g'
+}
+
 usage()
 {
-	echo $'Usage: wrapaur [OPTION]... [PACKAGE]...\n(for multiple packages pass option each time; e.g. -i package1 -i package2)\n  -a install from aur\n  -c clean pacman cache with pacman -Sc, optimize pacman database, and clear .wrapaur folder\n  -e check for updates from official repositories and aur and print available updates or email results if email is present in .wrapaurrc (add to cron or systemd timer to have email updates for new packages)\n      note: email must be properly configured on system\n  -i install from official repositories\n  -l list installed packages with package count\n  -m update pacman mirrorlist\n  -q query information on a specific package\n  -r remove a package with pacman -Rsn (for other removal options use pacman)\n  -s search official repositories and aur\n  -u update official repositories and aur'
+	echo $'Usage: wrapaur [OPTION]... [PACKAGE]...\n(for multiple packages pass option each time; e.g. -i package1 -i package2)\n  -a install from aur\n  -c clean pacman cache with pacman -Sc, optimize pacman database, and clear .wrapaur folder\n  -e check for updates from official repositories and aur and print available updates or email results if email is present in .wrapaurrc (add to cron or systemd timer to have email updates for new packages)\n      note: email must be properly configured on system\n  -i install from official repositories\n  -l list installed packages with package count\n  -m update pacman mirrorlist\n  -n print the latest news from archlinux.org\n  -o print aur comments for a specific package\n  -q query information on a specific package\n  -r remove a package with pacman -Rsn (for other removal options use pacman)\n  -s search official repositories and aur\n  -u update official repositories and aur'
 }
 
 ##########Main Program##########
 
-while getopts "a:cei:lmq:r:s:u" args; do
+while getopts "a:cei:lmno:q:r:s:u" args; do
 	case $args in
 		a)
 			aur_dep_install $OPTARG
@@ -575,6 +593,12 @@ while getopts "a:cei:lmq:r:s:u" args; do
 			;;
 		m)
 			update_mirrors
+			;;
+		n)
+			archnews
+			;;
+		o)
+			aur_comments $OPTARG
 			;;
 		q)
 			query_packages $OPTARG
