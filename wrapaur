@@ -459,7 +459,7 @@ check_pkgversion()
 	newver=$(curl -s "https://aur.archlinux.org/rpc.php?type=info&arg=$1" | awk -F : '{print $10}' | awk -F , '{print $1}' | sed 's/"//g')
 	currentver=$(pacman -Qi $1 | awk '{print $3}' | head -n 2 | tail -n 1)
 	if [[ $newver != $currentver ]]; then
-		return 1
+		echo 1
 	fi
 }
 
