@@ -10,7 +10,7 @@ license=('GPL')
 depends=('bash' 'coreutils' 'curl' 'grep' 'gawk' 'sed' 'git' 'pacman' 'sudo')
 optdepends=('s-nail: required for mail notifications')
 source=("wrapaur")
-md5sums=('3c60184ae4522e4bb79b13cf2bdede05')
+md5sums=('e6e9b8976d0a812ee8916c81403e9fc2')
 
 package() {
   install -Dm755 wrapaur "$pkgdir/usr/bin/wrapaur"
