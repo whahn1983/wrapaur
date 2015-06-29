@@ -124,9 +124,9 @@ update_mirrors()
 	if [ "$mirrorprompt" == "no" ] || [[ ! -t 0 ]]; then
 		sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
 		if [[ -z $country ]]; then
-			sudo curl -s "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&ip_version=4&use_mirror_status=on" | sed 's/#Server/Server/g' | head -n $((6+2*$mirrorcount)) > /etc/pacman.d/mirrorlist
+			curl -s "https://www.archlinux.org/mirrorlist/?country=all&protocol=http&ip_version=4&use_mirror_status=on" | sed 's/#Server/Server/g' | head -n $((6+2*$mirrorcount)) | sudo tee /etc/pacman.d/mirrorlist > /dev/null
 		else
-			sudo curl -s "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=http&ip_version=4&use_mirror_status=on" | sed 's/#Server/Server/g' | head -n $((6+2*$mirrorcount)) > /etc/pacman.d/mirrorlist
+			curl -s "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=http&ip_version=4&use_mirror_status=on" | sed 's/#Server/Server/g' | head -n $((6+2*$mirrorcount)) | sudo tee /etc/pacman.d/mirrorlist > /dev/null
 		fi
 	#run with prompts
 	else
@@ -366,10 +366,10 @@ update_mirrors()
 						*) echo Invalid Option;;
 					esac
 				done
-				sudo curl -s "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=http&ip_version=4&use_mirror_status=on" | sed 's/#Server/Server/g' | head -n $((6+2*$mirrorcount)) > /etc/pacman.d/mirrorlist
+				curl -s "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=http&ip_version=4&use_mirror_status=on" | sed 's/#Server/Server/g' | head -n $((6+2*$mirrorcount)) | sudo tee /etc/pacman.d/mirrorlist > /dev/null
 				echo -e " original mirrorlist has been backed up to /etc/pacman.d/mirrorlist.backup"
 			else
-				sudo curl -s "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=http&ip_version=4&use_mirror_status=on" | sed 's/#Server/Server/g' | head -n $((6+2*$mirrorcount)) > /etc/pacman.d/mirrorlist
+				curl -s "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=http&ip_version=4&use_mirror_status=on" | sed 's/#Server/Server/g' | head -n $((6+2*$mirrorcount)) | sudo tee /etc/pacman.d/mirrorlist > /dev/null
 				echo -e " original mirrorlist has been backed up to /etc/pacman.d/mirrorlist.backup"
 			fi
 		fi
