@@ -1,3 +1,6 @@
+NOTE: This github is no longer updated and is not the source of the latest wrapaur code.  The code is now maintained in the AUR using git.  Wrapaur 2.0.0-1 will be the last commit here.
+
+
 wrapaur
 =======
 
